@@ -15,35 +15,28 @@ if get(g:, "vim_markdown_folding_style_pythonic", 0)
     function! Foldexpr_markdown(lnum)
         let l1 = getline(a:lnum)
 
-        " keep track of fenced code blocks
-        "if l1 =~ '````*' || l1 =~ '\~\~\~\~*'
-        "    if b:fenced_block == 0
-        "        let b:fenced_block = 1
-        "    elseif b:fenced_block == 1
-        "        let b:fenced_block = 0
-        "    endif
-        "elseif g:vim_markdown_frontmatter == 1
-        "    if b:front_matter == 1 && a:lnum > 2
-        "        let l0 = getline(a:lnum-1)
-        "        if l0 == '---'
-        "            let b:front_matter = 0
-        "        endif
-        "    elseif a:lnum == 1
-        "        if l1 == '---'
-        "            let b:front_matter = 1
-        "        endif
-        "    endif
-        "endif
+        if g:vim_markdown_frontmatter == 1
+            if b:front_matter == 1 && a:lnum > 2
+                let l0 = getline(a:lnum-1)
+                if l0 == '---'
+                    let b:front_matter = 0
+                endif
+            elseif a:lnum == 1
+                if l1 == '---'
+                    let b:front_matter = 1
+                endif
+            endif
+        endif
 
-        "if b:fenced_block == 1 || b:front_matter == 1
-        "    if a:lnum == 1
-        "        " fold any 'preamble'
-        "        return '>1'
-        "    else
-        "        " keep previous foldlevel
-        "        return '='
-        "    endif
-        "endif
+        if b:front_matter == 1
+            if a:lnum == 1
+                " fold any 'preamble'
+                return '>1'
+            else
+                " keep previous foldlevel
+                return '='
+            endif
+        endif
 
         let l2 = getline(a:lnum+1)
         if l2 =~ '^==\+\s*' && !s:is_mkdCode(a:lnum+1)
@@ -85,29 +78,22 @@ else
             let l0 = getline(a:lnum-1)
         endif
 
-        " keep track of fenced code blocks
-        "if l0 =~ '````*' || l0 =~ '\~\~\~\~*'
-        "    if b:fenced_block == 0
-        "        let b:fenced_block = 1
-        "    elseif b:fenced_block == 1
-        "        let b:fenced_block = 0
-        "    endif
-        "elseif g:vim_markdown_frontmatter == 1
-        "    if b:front_matter == 1
-        "        if l0 == '---'
-        "            let b:front_matter = 0
-        "        endif
-        "    elseif a:lnum == 2
-        "        if l0 == '---'
-        "            let b:front_matter = 1
-        "        endif
-        "    endif
-        "endif
+        if g:vim_markdown_frontmatter == 1
+            if b:front_matter == 1
+                if l0 == '---'
+                    let b:front_matter = 0
+                endif
+            elseif a:lnum == 2
+                if l0 == '---'
+                    let b:front_matter = 1
+                endif
+            endif
+        endif
 
-        "if b:fenced_block == 1 || b:front_matter == 1
-        "    " keep previous foldlevel
-        "    return '='
-        "endif
+        if b:front_matter == 1
+            " keep previous foldlevel
+            return '='
+        endif
 
         let l2 = getline(a:lnum+1)
         if  l2 =~ '^==\+\s*' && !s:is_mkdCode(a:lnum+1)
@@ -144,7 +130,6 @@ else
 endif
 
 
-let b:fenced_block = 0
 let b:front_matter = 0
 let s:vim_markdown_folding_level = get(g:, "vim_markdown_folding_level", 1)
 
